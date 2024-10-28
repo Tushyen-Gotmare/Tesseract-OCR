@@ -4,15 +4,29 @@ from PIL import Image, ImageDraw
 import io
 import base64
 import os
+import platform
 
-# Tesseract Configuration
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# Tesseract Configuration based on environment
+if platform.system() == "Windows":
+    # Windows configuration
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+else:
+    # Linux/Mac configuration (no need to set path if installed correctly)
+    pass
 
 def verify_tesseract():
     try:
         version = pytesseract.get_tesseract_version()
         return True, f"Tesseract version: {version}"
     except Exception as e:
+        st.error("""
+        Tesseract is not installed. For local development:
+        - Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
+        - Mac: brew install tesseract
+        - Linux: sudo apt-get install tesseract-ocr
+        
+        For Streamlit Cloud deployment, add 'tesseract-ocr' to packages.txt
+        """)
         return False, f"Tesseract error: {str(e)}"
 
 def extract_text(image):
